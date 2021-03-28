@@ -177,6 +177,9 @@ class Pharm_WDG_CheckBox(QWidget):
         self.label    = QLabel(label)
         self.label.setWordWrap(True)
 
+        self.label.setStyleSheet("font-size: 25px;")
+        
+
         self.main_layout = QHBoxLayout()        
         self.main_layout.addWidget(self.checkbox)
         self.main_layout.addWidget(self.label)

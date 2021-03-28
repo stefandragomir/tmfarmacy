@@ -42,14 +42,14 @@ PHARM_NUMBER_OF_TEST_QUESTIONS = 10
 PHARM_MIN_CORECT_QUESTIONS     = 8
 PHARM_ANSWER_OPTIONS           = ["a","b","c","d","e","f","g","h"]
 PHARM_QUESTIONS_HEADING        = """
-INTREBARI EXAMEN ACORDARE/PRELUNGIRE
-LICENŢĂ PILOT AERONAVE ULTRAUŞOARE
-CLASA PARAPANTĂ
+Intrebari Examen Admitere 
+Universitatea de Medicină şi Farmacie Victor Babeş 
+Timişoara
 """ 
 PHARM_TEST_HEADING        = """
-CHESTIONAR EXAMEN ACORDARE/PRELUNGIRE
-LICENŢĂ PILOT AERONAVE ULTRAUŞOARE
-CLASA PARAPANTĂ
+Intrebari Examen Admitere 
+Universitatea de Medicină şi Farmacie Victor Babeş 
+Timişoara
 """ 
 
 """*************************************************************************************************
@@ -72,7 +72,7 @@ class Pharm_UI(QMainWindow):
         self.setWindowTitle("Admitere Farmacie 1.0.0")
         self.setWindowIcon(Pharm_Icon("pharm"))
         self.setMinimumSize(1300, 800)       
-        self.setMinimumHeight(500)
+        self.setMinimumHeight(800)
 
         self.setStyleSheet(PHARM_CSS)
 
@@ -179,7 +179,7 @@ class Pharm_UI(QMainWindow):
             _path_txt += "   %s \n" % (os.path.split(_path)[1],)
 
         _msg = QMessageBox()
-        _msg.setWindowIcon(Pharm_Icon("parag"))
+        _msg.setWindowIcon(Pharm_Icon("pharm"))
         _msg.setIcon(QMessageBox.Information)
         _msg.setText("Generat chestionare pentru test:\n%s"  % (_path_txt,))
         _msg.setWindowTitle("Generat Chestionar Test " )
@@ -413,7 +413,7 @@ class Pharm_WDG_Desktop(QWidget):
         if timestamp == None:
 
             _msg = QMessageBox()
-            _msg.setWindowIcon(Pharm_Icon("parag"))
+            _msg.setWindowIcon(Pharm_Icon("pharm"))
             _msg.setIcon(QMessageBox.Information)
             _msg.setText("Generat chestionar test in fisierul\n%s" % (os.path.split(_path)[1],))
             _msg.setWindowTitle("Generat Chestionar Test %s" % (self.category.name.upper(),))
@@ -617,7 +617,7 @@ class Pharm_WDG_Desktop(QWidget):
 
         _paragraph = _document.add_paragraph()
         _paragraph.add_run("%s\n%s" % (PHARM_QUESTIONS_HEADING,self.category.name.upper())).bold = True
-        _paragraph.alignment = WD_ALIGN_PHARMRAPH.CENTER
+        _paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
         _document.add_paragraph("")
         _document.add_paragraph("")
 
@@ -663,7 +663,7 @@ class Pharm_WDG_Desktop(QWidget):
         _document.save(_path)
 
         _msg = QMessageBox()
-        _msg.setWindowIcon(Pharm_Icon("parag"))
+        _msg.setWindowIcon(Pharm_Icon("pharm"))
         _msg.setIcon(QMessageBox.Information)
         _msg.setText("Generat intrebari in fisierul\n%s" % (os.path.split(_path)[1],))
         _msg.setWindowTitle("Generat Intrebari %s" % (self.category.name.upper(),))
@@ -706,6 +706,9 @@ class Pharm_WDG_Desktop_Test(QWidget):
         self.lbl_status = Pharm_WDG_Label()
         self.lbl_result = Pharm_WDG_Label()
 
+        self.lbl_status.setStyleSheet("font-size: 25px;")
+        self.lbl_result.setStyleSheet("font-size: 25px;")
+
         self.bt_layout = QHBoxLayout()
         
         self.bt_layout.addWidget(self.bt_close)
@@ -715,12 +718,18 @@ class Pharm_WDG_Desktop_Test(QWidget):
 
         self.wdg_question = Pharm_WDG_Question()
 
+        _policy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        
+        self.wdg_question.setSizePolicy(_policy)
+
         self.main_layout = QVBoxLayout()
         
         self.main_layout.addLayout(self.bt_layout)
         self.main_layout.addWidget(self.wdg_question)
         self.main_layout.addWidget(self.lbl_status)
         self.main_layout.addWidget(self.lbl_result)
+
+        self.main_layout.setAlignment(Qt.AlignTop)
 
         self.setLayout(self.main_layout) 
 
@@ -895,6 +904,8 @@ class Pharm_WDG_Question(QWidget):
         self.lbl_question.setWordWrap(True)
         self.lbl_image    = Pharm_WDG_Label()
         self.rd_answers   = []
+
+        self.lbl_question.setStyleSheet("font-size: 25px;")
 
         for _index in range(5):
             self.rd_answers.append(Pharm_WDG_CheckBox(""))

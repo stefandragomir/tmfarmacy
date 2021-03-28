@@ -461,8 +461,8 @@ PHARM_CSS = """
 				    color: #b1b1b1;
 				    background-color: #323232;
 				    border: 1px solid #b1b1b1;
-				    width: 9px;
-				    height: 9px;
+				    width: 20px;
+				    height: 20px;
 				}
 				
 				QRadioButton::indicator
@@ -480,8 +480,8 @@ PHARM_CSS = """
 				    color: #FFFFFF;
 				    background-color: #FFFFFF;
 				    border: 1px solid #FFFFFF;
-				    width: 9px;
-				    height: 9px;
+				    width: 20px;
+				    height: 20px;
 				}
 				
 				QCheckBox::indicator:disabled, QRadioButton::indicator:disabled
