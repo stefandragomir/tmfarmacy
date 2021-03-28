@@ -1,0 +1,7 @@
+*.pyc
+src/build
+src/dist
+*.spec
+parag.sublime-project
+parag.sublime-workspace
+parag_tests
