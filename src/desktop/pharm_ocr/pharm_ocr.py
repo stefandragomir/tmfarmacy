@@ -1,10 +1,25 @@
 import os
+import re
 from PIL           import Image
 from subprocess    import Popen
 from subprocess    import PIPE
 from subprocess    import STARTUPINFO
 from subprocess    import STARTF_USESHOWWINDOW
 from subprocess    import SW_HIDE
+from pprint        import pprint
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+MODEL_TEMPLATE = '''
+_question       = Pharm_Model_Question("%s")
+_category.questions.append(_question)
+_question.answers.append(Pharm_Model_Answer(False, "%s"))
+_question.answers.append(Pharm_Model_Answer(False, "%s"))
+_question.answers.append(Pharm_Model_Answer(False, "%s"))
+_question.answers.append(Pharm_Model_Answer(False, "%s"))
+_question.answers.append(Pharm_Model_Answer(False, "%s"))
+'''
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -69,11 +84,179 @@ class Pharm_Digitize(object):
 
         return _path
 
-    def run(self):
+    def image_to_text_file(self,input_path,output_path):
 
-        _files      = []
+        _text_files = []
+
+        for _file in os.listdir(self.path_images):
+
+            if os.path.splitext(_file)[1] == self.extension:
+
+                _file = os.path.join(self.path_images,_file)
+
+                print("converting file %s to output %s" % (_file,input_path))
+
+                _file_prep = self.prepare_image(_file,input_path)
+
+                _output = os.path.join(output_path, "%s" % (os.path.splitext(os.path.split(_file)[1])[0]))
+
+                print("converting file %s to output %s" % (_file,_output))
+
+                self.ocr(_file_prep,_output)
+
+                _text_files.append(_output)
+
+        return _text_files
+
+    def get_text_lines(self,file):
+
+        _data = ""
+
+        with open("%s.txt" % (file,),'r') as _file:
+
+            _data = _file.read()
+
+        _lines = [_line.strip() for _line in _data.split("\n") if _line.strip() != ""]
+
+        return _lines
+
+    def is_answer_a(self,text):
+
+        return None != re.match(r"^A\.\s.+$",text)
+
+    def is_answer_b(self,text):
+
+        return None != re.match(r"^B\.\s.+$",text)
+
+    def is_answer_c(self,text):
+
+        return None != re.match(r"^C\.\s.+$",text)
+
+    def is_answer_d(self,text):
+
+        return None != re.match(r"^D\.\s.+$",text)
+
+    def is_answer_e(self,text):
+
+        return None != re.match(r"^E\.\s.+$",text)
+
+    def is_answer(self,text):
+
+        return self.is_answer_a(text) or self.is_answer_b(text) or self.is_answer_c(text) or self.is_answer_d(text) or self.is_answer_e(text)
+
+    def text_files_to_model_text(self,text_files):
+
+        _STATE_QUESTION = 1
+        _STATE_ANSWER_A = 2
+        _STATE_ANSWER_B = 3
+        _STATE_ANSWER_C = 4
+        _STATE_ANSWER_D = 5
+        _STATE_ANSWER_E = 6
+
+        _model_text = ""
+
+        for _text_file in text_files:
+
+            _lines = self.get_text_lines(_text_file)
+
+            _state          = _STATE_QUESTION
+            _text_question  = ""
+            _text_answer_a  = ""
+            _text_answer_b  = ""
+            _text_answer_c  = ""
+            _text_answer_d  = ""
+            _text_answer_e  = ""
+
+            for _line in _lines:
+
+                if _state == _STATE_QUESTION:
+
+                    if self.is_answer(_line):
+                        if self.is_answer_a(_line):
+                            _text_answer_a += _line
+                            _state          = _STATE_ANSWER_A
+                        else:
+                            print("error: expecting question or answer a got other answer [%s]" % (line,))
+                    else:
+                        _text_question += _line
+
+                elif _state == _STATE_ANSWER_A:
+
+                    if self.is_answer(_line):
+                        if self.is_answer_b(_line):
+                            _text_answer_b += _line
+                            _state          = _STATE_ANSWER_B
+                        else:
+                            print("error: expecting answer a or b got other answer [%s]" % (line,))
+                    else:
+                        _text_answer_a += _line
+
+                elif _state == _STATE_ANSWER_B:
+
+                    if self.is_answer(_line):
+                        if self.is_answer_c(_line):
+                            _text_answer_c += _line
+                            _state          = _STATE_ANSWER_C
+                        else:
+                            print("error: expecting answer b or c got other answer [%s]" % (line,))
+                    else:
+                        _text_answer_b += _line
+
+                elif _state == _STATE_ANSWER_C:
+
+                    if self.is_answer(_line):
+                        if self.is_answer_d(_line):
+                            _text_answer_d += _line
+                            _state          = _STATE_ANSWER_D
+                        else:
+                            print("error: expecting answer c or d got other answer [%s]" % (line,))
+                    else:
+                        _text_answer_c += _line
+
+                elif _state == _STATE_ANSWER_D:
+
+                    if self.is_answer(_line):
+                        if self.is_answer_e(_line):
+                            _text_answer_e += _line
+                            _state          = _STATE_ANSWER_E
+                        else:
+                            print("error: expecting answer d or e got other answer [%s]" % (line,))
+                    else:
+                        _text_answer_e += _line
+
+                elif _state == _STATE_ANSWER_E:
+
+                    _state = _STATE_QUESTION
+
+                    print("QUESTION -> [%s]" % (_text_question))
+                    print("       A -> [%s]" % (_text_answer_a))
+                    print("       B -> [%s]" % (_text_answer_b))
+                    print("       C -> [%s]" % (_text_answer_c))
+                    print("       D -> [%s]" % (_text_answer_d))
+                    print("       E -> [%s]" % (_text_answer_e))
+                    print("-------------------------------------------")
+
+                    _model_text += MODEL_TEMPLATE % (   _text_question,
+                                                        _text_answer_a,
+                                                        _text_answer_b,
+                                                        _text_answer_c,
+                                                        _text_answer_d,
+                                                        _text_answer_e )
+
+                    _text_question  = _line
+                    _text_answer_a  = ""
+                    _text_answer_b  = ""
+                    _text_answer_c  = ""
+                    _text_answer_d  = ""
+                    _text_answer_e  = ""
+
+        return _model_text
+
+    def run(self):
+        
         _dir        = os.path.split(self.path_images)[0]
         _output_dir = os.path.join(_dir, "output")
+        _db_dir     = os.path.join(_dir, "db")
         _input_dir  = os.path.join(_dir, "input")
 
         if not os.path.exists(_output_dir):
@@ -84,23 +267,17 @@ class Pharm_Digitize(object):
 
             os.mkdir(_input_dir)
 
-        for _file in os.listdir(self.path_images):
+        if not os.path.exists(_db_dir):
 
-            if os.path.splitext(_file)[1] == self.extension:
+            os.mkdir(_db_dir)
 
-                _files.append(os.path.join(self.path_images,_file))
+        _text_files = self.image_to_text_file(_input_dir,_output_dir)
 
-        for _file in _files:
+        _model_text = self.text_files_to_model_text(_text_files)
 
-            print("converting file %s to output %s" % (_file,_input_dir))
+        with open(os.path.join(_db_dir,"db.py"),'w+') as _db:
 
-            _file_prep = self.prepare_image(_file,_input_dir)
-
-            _output = os.path.join(_output_dir, "%s.txt" % (os.path.splitext(os.path.split(_file)[1])[0]))
-
-            print("converting file %s to output %s" % (_file,_output))
-
-            self.ocr(_file_prep,_output)
+            _db.write(_model_text)
 
 """*************************************************************************************************
 ****************************************************************************************************
