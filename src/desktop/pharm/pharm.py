@@ -780,6 +780,10 @@ class Pharm_WDG_Desktop_Test(QWidget):
 
     def clbk_next(self,state):
 
+        for _index in range(len(self.test_learn.questions[self.question_number].answers)):
+            
+            self.wdg_question.rd_answers[_index].set_white()
+
         if not self.is_end(self.question_number):
 
             self.question_number += 1
@@ -800,6 +804,10 @@ class Pharm_WDG_Desktop_Test(QWidget):
                 self.bt_result.hide()
 
     def clbk_prev(self,state):
+
+        for _index in range(len(self.test_learn.questions[self.question_number].answers)):
+
+            self.wdg_question.rd_answers[_index].set_white()
 
         if self.test_type != "learn":
 
@@ -838,9 +846,9 @@ class Pharm_WDG_Desktop_Test(QWidget):
             for _index in range(len(self.test_learn.questions[self.question_number].answers)):
 
                 if self.test_learn.questions[self.question_number].answers[_index].corect:
-                    self.wdg_question.rd_answers[_index].setStyleSheet("QCheckBox { color: green }")
+                    self.wdg_question.rd_answers[_index].set_green()
                 else:
-                    self.wdg_question.rd_answers[_index].setStyleSheet("QCheckBox { color: red }")
+                    self.wdg_question.rd_answers[_index].set_red()
         else:
             _total,_corect,_incorect = self.test_exam.get_result()
 
@@ -905,7 +913,7 @@ class Pharm_WDG_Question(QWidget):
         self.lbl_image    = Pharm_WDG_Label()
         self.rd_answers   = []
 
-        self.lbl_question.setStyleSheet("font-size: 25px;")
+        self.lbl_question.setStyleSheet("font-size: 23px;")
 
         for _index in range(5):
             self.rd_answers.append(Pharm_WDG_CheckBox(""))

@@ -1,10 +1,10 @@
-_question       = Pharm_Model_Question("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-_category.questions.append(_question)
-_question.answers.append(Pharm_Model_Answer(False, "A. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
-_question.answers.append(Pharm_Model_Answer(False, "B. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
-_question.answers.append(Pharm_Model_Answer(False, "C. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
-_question.answers.append(Pharm_Model_Answer(False, "D. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
-_question.answers.append(Pharm_Model_Answer(False, "E. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
+# _question       = Pharm_Model_Question("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+# _category.questions.append(_question)
+# _question.answers.append(Pharm_Model_Answer(False, "A. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
+# _question.answers.append(Pharm_Model_Answer(False, "B. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
+# _question.answers.append(Pharm_Model_Answer(False, "C. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
+# _question.answers.append(Pharm_Model_Answer(False, "D. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
+# _question.answers.append(Pharm_Model_Answer(False, "E. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
 
 
 from pharm_model.pharm_model  import *

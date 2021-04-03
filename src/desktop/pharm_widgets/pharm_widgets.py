@@ -37,7 +37,6 @@ class Pharm_WDG_Small_Button(QPushButton):
     def leaveEvent(self, event):
         self.setIcon(QIcon(self.icon_normal))
 
-
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
@@ -177,15 +176,27 @@ class Pharm_WDG_CheckBox(QWidget):
         self.label    = QLabel(label)
         self.label.setWordWrap(True)
 
-        self.label.setStyleSheet("font-size: 25px;")
+        self.set_white()
         
-
         self.main_layout = QHBoxLayout()        
         self.main_layout.addWidget(self.checkbox)
         self.main_layout.addWidget(self.label)
         self.main_layout.addStretch(1)
 
         self.setLayout(self.main_layout)
+
+    def set_red(self):
+
+        self.label.setStyleSheet("font-size: 23px; color: red;")
+
+    def set_green(self):
+
+        self.label.setStyleSheet("font-size: 23px; color: green;")
+
+    def set_white(self):
+
+        self.label.setStyleSheet("font-size: 23px; color: #B1B1B1;")
+
 
 """*************************************************************************************************
 ****************************************************************************************************

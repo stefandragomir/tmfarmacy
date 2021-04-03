@@ -5,3 +5,4 @@ src/dist
 parag.sublime-project
 parag.sublime-workspace
 parag_tests
+*.pyo
