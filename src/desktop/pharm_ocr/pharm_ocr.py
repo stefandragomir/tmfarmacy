@@ -1,12 +1,15 @@
 import os
 import re
-from PIL           import Image
+import cv2
+import io
 from subprocess    import Popen
 from subprocess    import PIPE
 from subprocess    import STARTUPINFO
 from subprocess    import STARTF_USESHOWWINDOW
 from subprocess    import SW_HIDE
 from pprint        import pprint
+
+OCR_DPI = 72
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -26,12 +29,12 @@ _question.answers.append(Pharm_Model_Answer(False, "%s"))
 *************************************************************************************************"""
 class Pharm_Digitize(object):
 
-    def __init__(self,path_images,path_tesseract,extension=".jpg",rotate_angle=270):
+    def __init__(self,path_images,path_tesseract,extension=".jpg",th=100):
 
         self.path_images    = path_images
         self.path_tesseract = path_tesseract
         self.extension      = extension
-        self.rotate_angle   = rotate_angle
+        self.th             = th
 
     def call(self,command,cwd="",log=True):
 
@@ -69,18 +72,19 @@ class Pharm_Digitize(object):
     def ocr(self,path_image,path_output):
 
         _error = self.call(
-                            r"%s  %s %s -l ron --oem 3 --dpi 72" % (
+                            r"%s  %s %s -l ron --oem 3 --dpi %s" % (
                                                             self.path_tesseract,
                                                             path_image,
-                                                            path_output),
+                                                            path_output,
+                                                            OCR_DPI),
                             cwd=os.path.split(path_image)[0])
 
     def prepare_image(self,path_image,input_dir):
 
-        _img        = Image.open(path_image)
-        _rotate_img = _img.rotate(self.rotate_angle,expand=True)
-        _path       = os.path.join(input_dir,os.path.split(path_image)[1])
-        _rotate_img.save(_path)
+        _img           = cv2.imread(path_image, 2)
+        _ret, _bin_img = cv2.threshold(_img, self.th, 255, cv2.THRESH_BINARY)
+        _path          = os.path.join(input_dir,os.path.split(path_image)[1])
+        cv2.imwrite(_path, _bin_img) 
 
         return _path
 
@@ -112,7 +116,7 @@ class Pharm_Digitize(object):
 
         _data = ""
 
-        with open("%s.txt" % (file,),'r') as _file:
+        with io.open("%s.txt" % (file,),'r',encoding='utf-8') as _file:
 
             _data = _file.read()
 
@@ -176,7 +180,7 @@ class Pharm_Digitize(object):
                             _text_answer_a += _line
                             _state          = _STATE_ANSWER_A
                         else:
-                            print("error: expecting question or answer a got other answer [%s]" % (line,))
+                            print("error: expecting question or answer a got other answer [%s]" % (_line,))
                     else:
                         _text_question += _line
 
@@ -187,7 +191,7 @@ class Pharm_Digitize(object):
                             _text_answer_b += _line
                             _state          = _STATE_ANSWER_B
                         else:
-                            print("error: expecting answer a or b got other answer [%s]" % (line,))
+                            print("error: expecting answer a or b got other answer [%s]" % (_line,))
                     else:
                         _text_answer_a += _line
 
@@ -198,7 +202,7 @@ class Pharm_Digitize(object):
                             _text_answer_c += _line
                             _state          = _STATE_ANSWER_C
                         else:
-                            print("error: expecting answer b or c got other answer [%s]" % (line,))
+                            print("error: expecting answer b or c got other answer [%s]" % (_line,))
                     else:
                         _text_answer_b += _line
 
@@ -209,7 +213,7 @@ class Pharm_Digitize(object):
                             _text_answer_d += _line
                             _state          = _STATE_ANSWER_D
                         else:
-                            print("error: expecting answer c or d got other answer [%s]" % (line,))
+                            print("error: expecting answer c or d got other answer [%s]" % (_line,))
                     else:
                         _text_answer_c += _line
 
@@ -220,7 +224,7 @@ class Pharm_Digitize(object):
                             _text_answer_e += _line
                             _state          = _STATE_ANSWER_E
                         else:
-                            print("error: expecting answer d or e got other answer [%s]" % (line,))
+                            print("error: expecting answer d or e got other answer [%s]" % (_line,))
                     else:
                         _text_answer_e += _line
 
@@ -275,7 +279,7 @@ class Pharm_Digitize(object):
 
         _model_text = self.text_files_to_model_text(_text_files)
 
-        with open(os.path.join(_db_dir,"db.py"),'w+') as _db:
+        with io.open(os.path.join(_db_dir,"db.py"),'w+',encoding='utf-8') as _db:
 
             _db.write(_model_text)
 
@@ -287,4 +291,4 @@ if __name__ == "__main__":
     _path_images    = r"d:\temp\raw"
     _path_tesseract = r"d:\toolbox\tesseract\tesseract.exe"
 
-    Pharm_Digitize(_path_images,_path_tesseract).run()
+    Pharm_Digitize(_path_images,_path_tesseract,th=140).run()
