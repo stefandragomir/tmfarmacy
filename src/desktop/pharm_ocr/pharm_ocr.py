@@ -291,4 +291,4 @@ if __name__ == "__main__":
     _path_images    = r"d:\temp\raw"
     _path_tesseract = r"d:\toolbox\tesseract\tesseract.exe"
 
-    Pharm_Digitize(_path_images,_path_tesseract,th=140).run()
+    Pharm_Digitize(_path_images,_path_tesseract,th=150).run()
