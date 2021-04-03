@@ -1,12 +1,24 @@
-_question       = Pharm_Model_Question("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-_category.questions.append(_question)
-_question.answers.append(Pharm_Model_Answer(False, "A. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
-_question.answers.append(Pharm_Model_Answer(False, "B. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
-_question.answers.append(Pharm_Model_Answer(False, "C. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
-_question.answers.append(Pharm_Model_Answer(False, "D. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
-_question.answers.append(Pharm_Model_Answer(False, "E. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
+# _question       = Pharm_Model_Question("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+# _category.questions.append(_question)
+# _question.answers.append(Pharm_Model_Answer(False, "A. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
+# _question.answers.append(Pharm_Model_Answer(False, "B. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
+# _question.answers.append(Pharm_Model_Answer(False, "C. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
+# _question.answers.append(Pharm_Model_Answer(False, "D. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
+# _question.answers.append(Pharm_Model_Answer(False, "E. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
 
 
+from pharm_model.pharm_model  import *
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
+_category         = Pharm_Model_Category()
+_category.name    = "biologie"
+PHARM_CATEGORY_1 = _category
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
 _question       = Pharm_Model_Question("1.1 Sistemul nervos din punct de vedere morfologic si functional, este constituit din:")
 _category.questions.append(_question)
 _question.answers.append(Pharm_Model_Answer(False, "A. Sistemul nervos somatic, ce regleaza activitatea organelor interne"))
@@ -645,7 +657,7 @@ _question.answers.append(Pharm_Model_Answer(True,  "E. Sistemul limbic"))
 _question       = Pharm_Model_Question("1.80 Stimularea simpatică produce următoarele efecte în organism:")
 _category.questions.append(_question)
 _question.answers.append(Pharm_Model_Answer(False, "A. Coronarodilataţie"))
-_question.answers.append(Pharm_Model_Answer(False, "B. Bronhodilataţie"))
+_question.answers.append(Pharm_Model_Answer(True,  "B. Bronhodilataţie"))
 _question.answers.append(Pharm_Model_Answer(False, "C. Creşterea secreției lacrimale"))
-_question.answers.append(Pharm_Model_Answer(False, "D. Inhibarea secreției gastrice şi intestinale"))
-_question.answers.append(Pharm_Model_Answer(False, "E. Contracţia sfincterului vezical intern"))
+_question.answers.append(Pharm_Model_Answer(True,  "D. Inhibarea secreției gastrice şi intestinale"))
+_question.answers.append(Pharm_Model_Answer(True,  "E. Contracţia sfincterului vezical intern"))
