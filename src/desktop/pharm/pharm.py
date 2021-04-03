@@ -363,7 +363,7 @@ class Pharm_WDG_Desktop(QWidget):
 
         _paragraph = _document.add_paragraph()
         _paragraph.add_run("%s\n%s" % (PHARM_TEST_HEADING,self.category.name.upper())).bold = True
-        _paragraph.alignment = WD_ALIGN_PHARMRAPH.CENTER
+        _paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
         _document.add_paragraph("Test generat la data: %s" % (_timestamp,))
 
         _question_count = 0
@@ -479,7 +479,7 @@ class Pharm_WDG_Desktop(QWidget):
 
             _paragraph = document.add_paragraph()
             _paragraph.add_run("%s\n%s" % (PHARM_TEST_HEADING,self.category.name.upper())).bold = True
-            _paragraph.alignment = WD_ALIGN_PHARMRAPH.CENTER
+            _paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
             _table = document.add_table(rows=11, cols=4)
 
