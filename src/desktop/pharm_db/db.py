@@ -1,6 +1,13 @@
 
 
 
+_question       = Pharm_Model_Question("le afirmații sunt corecte legate de secrețiacă cu cea 4 sistemului nervos4următoare111.26. Care dintremedulosuprar enalei:")
+_category.questions.append(_question)
+_question.answers.append(Pharm_Model_Answer(False, "A. Normonti sceretați avegetativ SImpatieB, Între hormonii seeretați se|). Între hormonii seeretaţi Seu 0 acțiune identiaflă adrenalinaaflă serotoninaaflă noradrenalinao allă melatoninaȘ SPORI ire la pancreasul11.27. Care dintre afirmaţiile următoare cu referir pendocrin sunt adevărate?ancreaticăhans (| — 2% din masa"))
+_question.answers.append(Pharm_Model_Answer(False, "B. Este reprezentat de insulele lui L.angerpancreasului)"))
+_question.answers.append(Pharm_Model_Answer(False, "C. Secretă insulină"))
+_question.answers.append(Pharm_Model_Answer(False, "D. Secretă tripsină şi chimotripsină"))
+_question.answers.append(Pharm_Model_Answer(False, "E. ceretă e elucagon"))
 
 _question       = Pharm_Model_Question("a |e,111.28. Care dintre următoarele afirmaţii în legătură cu insulina suntcorecte?")
 _category.questions.append(_question)

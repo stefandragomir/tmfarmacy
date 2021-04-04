@@ -1465,9 +1465,21 @@ _question.answers.append(Pharm_Model_Answer(True,  "C. Dezvoltarea diferențiat�
 _question.answers.append(Pharm_Model_Answer(True,  "D. Timbrul vocii"))
 _question.answers.append(Pharm_Model_Answer(True,  "E. Depunerile lipidice la cele două sexe"))
 
+_question       = Pharm_Model_Question("3.26 Care dintre urmatoarele afirmatii sunt corecte legate de secretia medulosuprarenalei")
+_category.questions.append(_question)
+_question.answers.append(Pharm_Model_Answer(True,  "A. Hormonii secretati  au o actiune identica cu cea a sistemului nervos vegetativ simpatic"))
+_question.answers.append(Pharm_Model_Answer(True,  "B. Intre hormonii secretati se afla adrenalina"))
+_question.answers.append(Pharm_Model_Answer(False, "C. Intre hormonii secretati se afla serotonina"))
+_question.answers.append(Pharm_Model_Answer(True,  "D. Intre hormonii secretati se afla noradrenalina"))
+_question.answers.append(Pharm_Model_Answer(False, "E. Intre hormonii secretati se afla melatonina"))
 
-
-
+_question       = Pharm_Model_Question("3.27 Care dintre afirmatiile urmatoare cu referire la pancreas endocrin sunt adevarate?")
+_category.questions.append(_question)
+_question.answers.append(Pharm_Model_Answer(False, "A. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
+_question.answers.append(Pharm_Model_Answer(False, "B. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
+_question.answers.append(Pharm_Model_Answer(False, "C. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
+_question.answers.append(Pharm_Model_Answer(False, "D. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
+_question.answers.append(Pharm_Model_Answer(False, "E. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
 
 
 
