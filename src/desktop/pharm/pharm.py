@@ -843,12 +843,8 @@ class Pharm_WDG_Desktop_Test(QWidget):
 
         if self.test_type == "learn":
 
-            for _index in range(len(self.test_learn.questions[self.question_number].answers)):
-
-                if self.test_learn.questions[self.question_number].answers[_index].corect:
-                    self.wdg_question.rd_answers[_index].set_green()
-                else:
-                    self.wdg_question.rd_answers[_index].set_red()
+            self.color_questions_status(self.test_learn.questions[self.question_number])
+            
         else:
             _total,_corect,_incorect = self.test_exam.get_result()
 
@@ -870,6 +866,15 @@ class Pharm_WDG_Desktop_Test(QWidget):
                 self.lbl_result.setText("PICAT")
                 self.lbl_result.setStyleSheet("QLabel { background-color : #ba2012; font: 18pt;  color: #ffffff}")
                 self.lbl_result.setAlignment(Qt.AlignCenter)
+
+    def color_questions_status(self,question):
+
+        for _index in range(len(question.answers)):
+
+            if question.answers[_index].corect:
+                self.wdg_question.rd_answers[_index].set_green()
+            else:
+                self.wdg_question.rd_answers[_index].set_red()
 
     def set_status(self):
 
