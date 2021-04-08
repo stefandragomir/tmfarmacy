@@ -168,34 +168,38 @@ class Pharm_WDG_RadioButton(QRadioButton):
 *************************************************************************************************"""
 class Pharm_WDG_CheckBox(QWidget):
 
-    def __init__(self,label):
+    def __init__(self,text):
 
         QWidget.__init__(self)
 
         self.checkbox = QCheckBox()
-        self.label    = QLabel(label)
-        self.label.setWordWrap(True)
+        self.text     = QTextEdit()
+        self.text.setPlainText(text)
+        self.text.setReadOnly(True)
 
         self.set_white()
         
         self.main_layout = QHBoxLayout()        
         self.main_layout.addWidget(self.checkbox)
-        self.main_layout.addWidget(self.label)
-        self.main_layout.addStretch(1)
+        self.main_layout.addWidget(self.text)
 
         self.setLayout(self.main_layout)
 
+    def set_text(self,text):
+
+        self.text.setPlainText(text)                                                                                       
+
     def set_red(self):
 
-        self.label.setStyleSheet("font-size: 23px; color: red;")
+        self.text.setStyleSheet("font-size: 21px; color: red;")
 
     def set_green(self):
 
-        self.label.setStyleSheet("font-size: 23px; color: green;")
+        self.text.setStyleSheet("font-size: 21px; color: green;")
 
     def set_white(self):
 
-        self.label.setStyleSheet("font-size: 23px; color: #B1B1B1;")
+        self.text.setStyleSheet("font-size: 21px; color: #B1B1B1;")
 
 
 """*************************************************************************************************

@@ -86,11 +86,6 @@ class Pharm_UI(QMainWindow):
 
         self.toolbar_layout = QHBoxLayout()
 
-        self.bt_generate_all = Pharm_WDG_Button("Genereaza Teste",           Pharm_Icon("generate_test"), Pharm_Icon("generate_test"), "#606060")
-        self.toolbar_layout.addWidget(self.bt_generate_all)
-
-        self.bt_generate_all.clicked.connect(self.clbk_bt_gen_all)
-
         #left tree layout area
         self.tree_area = QVBoxLayout()   
         self.tree_area.addLayout(self.toolbar_layout) 
@@ -159,33 +154,6 @@ class Pharm_UI(QMainWindow):
             self.context.insertWidget(_idx + 1, _desktop) 
 
         self.context.setCurrentIndex(0)  
-
-    def clbk_bt_gen_all(self,state):
-
-        _paths = []
-
-        _timestamp = str(datetime.now())
-
-        for _desktop in self.dekstops:
-
-            _path = _desktop.clbk_bt_gen(state=True,timestamp=_timestamp)
-
-            _paths.append(_path)
-
-        _path_txt = ""
-
-        for _path in _paths:
-
-            _path_txt += "   %s \n" % (os.path.split(_path)[1],)
-
-        _msg = QMessageBox()
-        _msg.setWindowIcon(Pharm_Icon("pharm"))
-        _msg.setIcon(QMessageBox.Information)
-        _msg.setText("Generat chestionare pentru test:\n%s"  % (_path_txt,))
-        _msg.setWindowTitle("Generat Chestionar Test " )
-        _msg.exec_()
-
-        os.startfile(os.path.split(_path)[0])
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -915,7 +883,6 @@ class Pharm_WDG_Question(QWidget):
 
         self.lbl_question = Pharm_WDG_Label()
         self.lbl_question.setWordWrap(True)
-        self.lbl_image    = Pharm_WDG_Label()
         self.rd_answers   = []
 
         self.lbl_question.setStyleSheet("font-size: 23px;")
@@ -925,24 +892,22 @@ class Pharm_WDG_Question(QWidget):
             self.rd_answers[-1].checkbox.stateChanged.connect(partial(self.clbk_answer,_index))
 
         self.main_layout = QVBoxLayout()
+
         self.main_layout.addWidget(self.lbl_question)
-        self.main_layout.addWidget(self.lbl_image)
 
         for _index in range(5):
+
             self.main_layout.addWidget(self.rd_answers[_index])
 
         self.setLayout(self.main_layout)
 
         self.lbl_question.hide()
-        self.lbl_image.hide()
 
         for _index in range(5):
 
             self.rd_answers[_index].hide()
 
     def populate(self,question):
-
-        self.lbl_image.hide()
 
         for _index in range(5):
 
@@ -952,29 +917,11 @@ class Pharm_WDG_Question(QWidget):
 
         self.lbl_question.show()
 
-        if question.image != None:
-
-            self.lbl_image.show()
-
-            _barray      = QByteArray()
-            _barray_data = _barray.fromBase64(question.image.encode("utf-8"))
-
-            #create pixmap from base64 data
-            _pixmap = QPixmap ()
-            _pixmap.loadFromData(_barray_data, "PNG")
-
-            _w = 600
-            _h = 600
-
-            self.lbl_image.setPixmap(_pixmap.scaled(_w,_h,Qt.KeepAspectRatio))
-            self.lbl_image.setMask(_pixmap.mask())
-
-
         for _index in range(len(self.question.answers)):
 
             self.rd_answers[_index].show()
             self.rd_answers[_index].setStyleSheet("QCheckBox { color: #b1b1b1 }")
-            self.rd_answers[_index].label.setText(self.question.answers[_index].text)
+            self.rd_answers[_index].set_text(self.question.answers[_index].text)
 
             if self.question.answers[_index].selected:
                 self.rd_answers[_index].checkbox.setCheckState(Qt.Checked)
