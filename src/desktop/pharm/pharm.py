@@ -69,7 +69,7 @@ class Pharm_UI(QMainWindow):
 
     def draw_gui(self):
 
-        self.setWindowTitle("Admitere Farmacie 1.0.0")
+        self.setWindowTitle("Admitere Farmacie 1.1.0")
         self.setWindowIcon(Pharm_Icon("pharm"))
         self.setMinimumSize(1300, 800)       
         self.setMinimumHeight(800)
@@ -196,7 +196,7 @@ class Pharm_Model_Test(object):
             else:
                 _incorect += 1
 
-        return _total,_corect,_incorect
+        return _corect,_incorect
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -654,6 +654,7 @@ class Pharm_WDG_Desktop_Test(QWidget):
         self.test_type       = ""
         self.test_learn      = Pharm_Model_Test()
         self.test_exam       = Pharm_Model_Test()
+        self.is_finished     = False
 
         self.test_learn.questions = self.category.questions
 
@@ -710,6 +711,8 @@ class Pharm_WDG_Desktop_Test(QWidget):
 
     def start(self,test_type):
 
+        self.is_finished = False
+
         self.test_type = test_type
 
         self.question_number = 0
@@ -718,7 +721,7 @@ class Pharm_WDG_Desktop_Test(QWidget):
 
         if self.test_type == "learn":            
             self.test_learn.clear()
-            self.wdg_question.populate(self.test_learn.questions[self.question_number])
+            self.wdg_question.populate(self.test_learn.questions[self.question_number], True)
             self.bt_next.show()
             self.bt_close.show()
             self.bt_result.show()
@@ -727,9 +730,10 @@ class Pharm_WDG_Desktop_Test(QWidget):
             self.test_exam.clear()
             self.bt_close.show()
             self.bt_next.show()
+            self.bt_result.hide()
             self.bt_prev.show()
             self.get_test_questions()
-            self.wdg_question.populate(self.test_exam.questions[self.question_number])
+            self.wdg_question.populate(self.test_exam.questions[self.question_number], True)
 
         self.lbl_result.hide()
         self.set_status()
@@ -750,32 +754,36 @@ class Pharm_WDG_Desktop_Test(QWidget):
 
         for _index in range(len(self.test_learn.questions[self.question_number].answers)):
             
-            self.wdg_question.rd_answers[_index].set_white()
+            self.wdg_question.rd_answers[_index].set_text_normal()
 
         if not self.is_end(self.question_number):
 
             self.question_number += 1
 
             if self.test_type == "learn":
-                self.wdg_question.populate(self.test_learn.questions[self.question_number])
+                self.wdg_question.populate(self.test_learn.questions[self.question_number],True)
             else:
-                self.wdg_question.populate(self.test_exam.questions[self.question_number])
+                self.wdg_question.populate(self.test_exam.questions[self.question_number],not self.is_finished)
 
             self.set_status()
         else:
             pass
 
-        if self.test_type != "learn":
+        if self.test_type != "learn" and not self.is_finished:
             if self.question_number == len(self.test_exam.questions) - 1:
                 self.bt_result.show()
             else:
                 self.bt_result.hide()
 
+        if self.is_finished:
+
+            self.color_questions_status()
+
     def clbk_prev(self,state):
 
         for _index in range(len(self.test_learn.questions[self.question_number].answers)):
 
-            self.wdg_question.rd_answers[_index].set_white()
+            self.wdg_question.rd_answers[_index].set_text_normal()
 
         if self.test_type != "learn":
 
@@ -786,14 +794,18 @@ class Pharm_WDG_Desktop_Test(QWidget):
             self.question_number -= 1
 
             if self.test_type == "learn":
-                self.wdg_question.populate(self.test_learn.questions[self.question_number])
+                self.wdg_question.populate(self.test_learn.questions[self.question_number],True)
             else:
-                self.wdg_question.populate(self.test_exam.questions[self.question_number])
+                self.wdg_question.populate(self.test_exam.questions[self.question_number],not self.is_finished)
 
             self.set_status()
 
         else:
             pass
+
+        if self.is_finished:
+
+            self.color_questions_status()
 
     def clbk_close(self,state):
 
@@ -811,38 +823,47 @@ class Pharm_WDG_Desktop_Test(QWidget):
 
         if self.test_type == "learn":
 
-            self.color_questions_status(self.test_learn.questions[self.question_number])
+            self.color_questions_status()
             
         else:
-            _total,_corect,_incorect = self.test_exam.get_result()
+            self.is_finished = True
 
-            self.lbl_status.setText("Intrebari[%s] Corecte[%s] Incorecte[%s]" % (_total,_corect,_incorect))
+            self.wdg_question.populate(self.test_exam.questions[self.question_number],not self.is_finished)
 
-            self.bt_next.hide()
-            self.bt_prev.hide()
+            self.color_questions_status()
+
+            _corect,_incorect = self.test_exam.get_result()
             self.bt_result.hide()
             self.bt_close.show()
-            self.wdg_question.hide()
 
             self.lbl_result.show()
 
             if _corect >= PHARM_MIN_CORECT_QUESTIONS:
-                self.lbl_result.setText("ADMIS")
+                self.lbl_result.setText("ADMIS Corecte[%s] Incorecte[%s]" % (_corect,_incorect))
                 self.lbl_result.setStyleSheet("QLabel { background-color : #14c941; font: 18pt; color: #ffffff}")
                 self.lbl_result.setAlignment(Qt.AlignCenter)
             else:
-                self.lbl_result.setText("PICAT")
+                self.lbl_result.setText("PICAT Corecte[%s] Incorecte[%s]" % (_corect,_incorect))
                 self.lbl_result.setStyleSheet("QLabel { background-color : #ba2012; font: 18pt;  color: #ffffff}")
                 self.lbl_result.setAlignment(Qt.AlignCenter)
 
-    def color_questions_status(self,question):
+    def color_questions_status(self):
 
-        for _index in range(len(question.answers)):
+        if self.test_type == "learn":
+            _question    = self.test_learn.questions[self.question_number]
+        else:
+            _question = self.test_exam.questions[self.question_number]
 
-            if question.answers[_index].corect:
-                self.wdg_question.rd_answers[_index].set_green()
+        for _index in range(len(_question.answers)):
+
+            self.wdg_question.rd_answers[_index].set_check_state(_question.answers[_index].selected)
+
+            if _question.answers[_index].corect:
+
+                self.wdg_question.rd_answers[_index].set_text_corect()               
+
             else:
-                self.wdg_question.rd_answers[_index].set_red()
+                self.wdg_question.rd_answers[_index].set_text_incorrect()
 
     def set_status(self):
 
@@ -889,7 +910,7 @@ class Pharm_WDG_Question(QWidget):
 
         for _index in range(5):
             self.rd_answers.append(Pharm_WDG_CheckBox(""))
-            self.rd_answers[-1].checkbox.stateChanged.connect(partial(self.clbk_answer,_index))
+            self.rd_answers[-1].register_checkbox_clbk(partial(self.clbk_answer,_index))
 
         self.main_layout = QVBoxLayout()
 
@@ -907,7 +928,7 @@ class Pharm_WDG_Question(QWidget):
 
             self.rd_answers[_index].hide()
 
-    def populate(self,question):
+    def populate(self,question,with_checks):
 
         for _index in range(5):
 
@@ -919,14 +940,21 @@ class Pharm_WDG_Question(QWidget):
 
         for _index in range(len(self.question.answers)):
 
+            self.rd_answers[_index].set_text_normal()
+
+            if not with_checks:
+                self.rd_answers[_index].hide_check()
+            else:
+                self.rd_answers[_index].show_check()
+
             self.rd_answers[_index].show()
-            self.rd_answers[_index].setStyleSheet("QCheckBox { color: #b1b1b1 }")
             self.rd_answers[_index].set_text(self.question.answers[_index].text)
 
-            if self.question.answers[_index].selected:
-                self.rd_answers[_index].checkbox.setCheckState(Qt.Checked)
-            else:
-                self.rd_answers[_index].checkbox.setCheckState(Qt.Unchecked)
+            if with_checks:
+                if self.question.answers[_index].selected:
+                    self.rd_answers[_index].set_check_state(True)
+                else:
+                    self.rd_answers[_index].set_check_state(False)
 
         self.lbl_question.setText(self.question.text)
 

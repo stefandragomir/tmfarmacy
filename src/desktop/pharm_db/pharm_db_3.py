@@ -228,13 +228,13 @@ _question.answers.append(Pharm_Model_Answer(False, "C. Intre hormonii secretati 
 _question.answers.append(Pharm_Model_Answer(True,  "D. Intre hormonii secretati se afla noradrenalina"))
 _question.answers.append(Pharm_Model_Answer(False, "E. Intre hormonii secretati se afla melatonina"))
 
-_question       = Pharm_Model_Question("3.27 Care dintre afirmatiile urmatoare cu referire la pancreas endocrin sunt adevarate?")
-_category.questions.append(_question)
-_question.answers.append(Pharm_Model_Answer(False, "A. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
-_question.answers.append(Pharm_Model_Answer(True,  "B. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
-_question.answers.append(Pharm_Model_Answer(True,  "C. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
-_question.answers.append(Pharm_Model_Answer(False, "D. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
-_question.answers.append(Pharm_Model_Answer(True,  "E. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
+# _question       = Pharm_Model_Question("3.27 Care dintre afirmatiile urmatoare cu referire la pancreas endocrin sunt adevarate?")
+# _category.questions.append(_question)
+# _question.answers.append(Pharm_Model_Answer(False, "A. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
+# _question.answers.append(Pharm_Model_Answer(True,  "B. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
+# _question.answers.append(Pharm_Model_Answer(True,  "C. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
+# _question.answers.append(Pharm_Model_Answer(False, "D. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
+# _question.answers.append(Pharm_Model_Answer(True,  "E. AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"))
 
 
 

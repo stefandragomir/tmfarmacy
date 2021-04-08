@@ -1,9 +1,11 @@
 
+import sip
 
-from PyQt5.QtCore           import *
-from PyQt5.QtGui            import *
-from PyQt5.QtChart          import *
-from PyQt5.QtWidgets        import * 
+from PyQt5.QtCore              import *
+from PyQt5.QtGui               import *
+from PyQt5.QtChart             import *
+from PyQt5.QtWidgets           import * 
+from pharm_icons.pharm_icons   import Pharm_Pixmap
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -173,33 +175,54 @@ class Pharm_WDG_CheckBox(QWidget):
         QWidget.__init__(self)
 
         self.checkbox = QCheckBox()
+        self.checkbox.setStyleSheet("color: #b1b1b1")
+
         self.text     = QTextEdit()
         self.text.setPlainText(text)
         self.text.setReadOnly(True)
 
-        self.set_white()
+        self.set_text_normal()
         
-        self.main_layout = QHBoxLayout()        
+        self.main_layout = QHBoxLayout()   
         self.main_layout.addWidget(self.checkbox)
         self.main_layout.addWidget(self.text)
 
         self.setLayout(self.main_layout)
 
+    def hide_check(self):
+
+        self.checkbox.setEnabled(False)
+
+    def show_check(self):
+
+        self.checkbox.setEnabled(True)
+
+    def register_checkbox_clbk(self,clbk):
+
+        self.checkbox.stateChanged.connect(clbk)
+
+    def set_check_state(self,state):
+
+        if state:
+            self.checkbox.setCheckState(Qt.Checked)
+        else:
+            self.checkbox.setCheckState(Qt.Unchecked)
+
     def set_text(self,text):
 
         self.text.setPlainText(text)                                                                                       
 
-    def set_red(self):
+    def set_text_incorrect(self):
 
-        self.text.setStyleSheet("font-size: 21px; color: red;")
+        self.text.setStyleSheet("font-size: 21px; font-weight: normal; border: 2px solid #e81a1a;")
 
-    def set_green(self):
+    def set_text_corect(self):
 
-        self.text.setStyleSheet("font-size: 21px; color: green;")
+        self.text.setStyleSheet("font-size: 21px; font-weight: normal;  border: 2px solid #37e64b;")
 
-    def set_white(self):
+    def set_text_normal(self):
 
-        self.text.setStyleSheet("font-size: 21px; color: #B1B1B1;")
+        self.text.setStyleSheet("font-size: 21px; font-weight: normal; border: 1px solid #ffffff;")
 
 
 """*************************************************************************************************
