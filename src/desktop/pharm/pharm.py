@@ -13,6 +13,7 @@ except:
 _path = os.path.split(os.path.split(os.path.abspath("__file__"))[0])[0]
 sys.path.append(_path)
 
+from math                         import floor
 from docx                         import Document
 from docx.enum.text               import WD_ALIGN_PARAGRAPH
 from PyQt5.QtCore                 import *
@@ -23,6 +24,7 @@ from pharm_widgets.pharm_css      import *
 from pharm_icons.pharm_icons      import Pharm_Icon
 from pharm_icons.pharm_icons      import Pharm_Pixmap
 from datetime                     import datetime
+from datetime                     import timedelta
 from pharm_db.pharm_db            import PHARM_DB
 from docx                         import Document
 from docx.enum.text               import WD_BREAK
@@ -253,34 +255,42 @@ class Pharm_WDG_Desktop(QWidget):
 
     def draw_gui(self):
 
-        self.bt_test  = Pharm_WDG_Button("Test",              Pharm_Icon("test_normal"),   Pharm_Icon("test_hover"),  "#606060")
-        self.bt_learn = Pharm_WDG_Button("Invata",            Pharm_Icon("learn_normal"),  Pharm_Icon("learn_hover"), "#606060")
-        self.bt_gen   = Pharm_WDG_Button("Genereaza Test",    Pharm_Icon("generate_test"), Pharm_Icon("generate_test"), "#606060")
-        self.bt_exp   = Pharm_WDG_Button("Exporta Intrebari", Pharm_Icon("generate_doc"), Pharm_Icon("generate_doc"), "#606060")
+        self.bt_test  = Pharm_WDG_Button("Test",              Pharm_Icon("test_normal"),   Pharm_Icon("test_hover"),    "#606060")
+        self.bt_learn = Pharm_WDG_Button("Invata",            Pharm_Icon("learn_normal"),  Pharm_Icon("learn_hover"),   "#606060")
+        self.bt_gen   = Pharm_WDG_Button("Genereaza",         Pharm_Icon("generate_test"), Pharm_Icon("generate_test"), "#606060")
+        self.bt_exp   = Pharm_WDG_Button("Exporta",           Pharm_Icon("generate_doc"),  Pharm_Icon("generate_doc"),  "#606060")
+        self.bt_stats = Pharm_WDG_Button("Statistici",        Pharm_Icon("stats"),         Pharm_Icon("stats"),         "#606060")
 
         self.bt_test.setIconSize(QSize(100,100))
         self.bt_learn.setIconSize(QSize(100,100))
         self.bt_gen.setIconSize(QSize(100,100))
         self.bt_exp.setIconSize(QSize(100,100))
+        self.bt_stats.setIconSize(QSize(100,100))
 
         self.bt_test.clicked.connect(self.clbk_bt_test)
         self.bt_learn.clicked.connect(self.clbk_bt_learn)
         self.bt_gen.clicked.connect(self.clbk_bt_gen)
         self.bt_exp.clicked.connect(self.clbk_bt_exp)
+        self.bt_stats.clicked.connect(self.clbk_bt_stats)
 
-        self.wdg_test = Pharm_WDG_Desktop_Test(self,self.category,self.stats)
+        self.wdg_test  = Pharm_WDG_Desktop_Test(self,self.category,self.stats)
+        self.wdg_stats = Pharm_WDG_Desktop_Stats(self)
 
         self.bt_layout = QHBoxLayout()
         self.bt_layout.addWidget(self.bt_learn)
         self.bt_layout.addWidget(self.bt_test)
         self.bt_layout.addWidget(self.bt_gen)
         self.bt_layout.addWidget(self.bt_exp)
+        self.bt_layout.addWidget(self.bt_stats)
 
         self.main_layout = QVBoxLayout()
         self.main_layout.addLayout(self.bt_layout)
         self.main_layout.addWidget(self.wdg_test)
+        self.main_layout.addWidget(self.wdg_stats)
 
         self.wdg_test.hide()
+
+        self.wdg_stats.hide()
 
         self.setLayout(self.main_layout)  
 
@@ -328,9 +338,7 @@ class Pharm_WDG_Desktop(QWidget):
 
         return _path,_timestamp
 
-    def clbk_bt_test(self,state):
-
-        self.wdg_test.show()
+    def hide_buttons(self):
 
         self.bt_test.hide()
 
@@ -338,7 +346,17 @@ class Pharm_WDG_Desktop(QWidget):
 
         self.bt_gen.hide()
 
+        self.bt_stats.hide()
+
         self.bt_exp.hide()
+
+    def clbk_bt_test(self,state):
+
+        self.wdg_test.show()
+
+        self.wdg_stats.hide()
+
+        self.hide_buttons()
 
         self.wdg_test.start("test")
 
@@ -346,13 +364,9 @@ class Pharm_WDG_Desktop(QWidget):
 
         self.wdg_test.show()
 
-        self.bt_test.hide()
+        self.wdg_stats.hide()
 
-        self.bt_learn.hide()
-
-        self.bt_gen.hide()
-
-        self.bt_exp.hide()
+        self.hide_buttons()
 
         self.wdg_test.start("learn")
 
@@ -431,6 +445,16 @@ class Pharm_WDG_Desktop(QWidget):
             os.startfile(_path)
 
         return _path
+
+    def clbk_bt_stats(self,state):
+
+        self.wdg_test.hide()
+
+        self.wdg_stats.show()
+
+        self.hide_buttons()
+
+        self.wdg_stats.refresh()
 
     def __generate_top_table(self,document):
 
@@ -671,6 +695,204 @@ class Pharm_WDG_Desktop(QWidget):
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
+class Pharm_WDG_Desktop_Stats(QWidget):
+
+    def __init__(self,parent):
+
+        QWidget.__init__(self)
+
+        self.parent = parent
+        self.stats  = parent.stats
+
+        self.draw_gui()
+
+    def draw_gui(self):
+
+        self.bt_close           = Pharm_WDG_Small_Button( Pharm_Icon("close_normal"),      Pharm_Icon("close_hover"),    self.clbk_close, "Inchide")
+        self.wdg_plot_questions = Pharm_WDG_Plot_StackedBar_Periods(self)
+        self.wdg_plot_tests     = Pharm_WDG_Plot_StackedBar_Periods(self)
+        self.wdg_plot_time      = Pharm_WDG_Plot_StackedBar_Periods(self)
+
+        self.bt_close.setIconSize(QSize(30,30))
+
+        self.main_layout = QVBoxLayout()
+        
+        self.main_layout.addWidget(self.bt_close)
+        self.main_layout.addWidget(self.wdg_plot_questions.chart_view)
+        self.main_layout.addWidget(self.wdg_plot_tests.chart_view)
+        self.main_layout.addWidget(self.wdg_plot_time.chart_view)
+
+        self.main_layout.setAlignment(Qt.AlignTop)
+
+        self.setLayout(self.main_layout) 
+
+        self.refresh()
+
+    def clbk_close(self,state):
+
+        self.parent.bt_test.show()
+        self.parent.bt_learn.show()
+        self.parent.bt_gen.show()
+        self.parent.bt_stats.show()
+        self.parent.bt_exp.show()
+        self.parent.wdg_test.hide()
+        self.parent.wdg_stats.hide()
+    
+    def get_last_days(self,days):
+
+        _periods = []
+
+        _last_day  = datetime.now()
+        _first_day = _last_day - timedelta(days=days)
+
+        for _index in range(days + 1):
+
+            _day = _first_day + timedelta(days=_index)
+
+            _periods.append([
+                                "%s-%s-%s" % (_day.year,_day.month,_day.day),
+                                _day.replace(hour=0,minute=0,second=0),
+                                _day.replace(hour=23,minute=59,second=59),
+                            ])
+
+        return _periods      
+    
+    def read_questions(self):
+
+        _values = [[],[]]
+        _labels = []
+
+        _periods = self.get_last_days(15)
+
+        _questions = self.stats.read_questions()
+
+        for _period in _periods:
+
+            _status_ok  = 0
+            _status_nok = 0
+
+            _labels.append(_period[0])
+
+            for _question in _questions:
+
+                _time = datetime.strptime(_question.time,"%Y-%m-%d %H:%M:%S.%f")
+
+                if _time >= _period[1] and _time <= _period[2]:
+                    if 1 == _question.status:
+                        _status_ok += 1
+                    else:
+                        _status_nok += 1
+
+            _values[0].append(_status_ok)
+            _values[1].append(_status_nok)
+
+        return _values, _labels
+
+    def read_tests(self):
+
+        _values = [[],[]]
+        _labels = []
+
+        _periods = self.get_last_days(15)
+
+        _tests = self.stats.read_tests()
+
+        for _period in _periods:
+
+            _status_ok  = 0
+            _status_nok = 0
+
+            _labels.append(_period[0])
+
+            for _test in _tests:
+
+                _time = datetime.strptime(_test.time,"%Y-%m-%d %H:%M:%S.%f")
+
+                if _time >= _period[1] and _time <= _period[2]:
+                    if 1 == _test.status:
+                        _status_ok += 1
+                    else:
+                        _status_nok += 1
+
+            _values[0].append(_status_ok)
+            _values[1].append(_status_nok)
+
+        return _values, _labels
+
+    def read_time(self):
+
+        _values = [[]]
+        _labels = []
+
+        _periods = self.get_last_days(15)
+
+        _tests = self.stats.read_tests()
+
+        for _period in _periods:
+
+            _duration  = 0
+
+            _labels.append(_period[0])
+
+            for _test in _tests:
+
+                _time = datetime.strptime(_test.time,"%Y-%m-%d %H:%M:%S.%f")
+
+                if _time >= _period[1] and _time <= _period[2]:
+                    _duration += _test.duration
+
+            _values[0].append(floor(_duration/60))
+
+        return _values, _labels
+
+
+    def refresh(self):
+
+        _values, _x_labels = self.read_questions()
+
+        self.wdg_plot_questions.clear()
+
+        _y_labels        = ["Raspunsuri Corecte","Raspunsuri Incorecte"]
+        _y_labels_colors = ["#1da14f","#ba1c34"]
+
+        self.wdg_plot_questions.draw(
+                                        "",
+                                        _values,
+                                        _y_labels,
+                                        _y_labels_colors,
+                                        _x_labels)
+
+        _values, _x_labels = self.read_tests()
+
+        self.wdg_plot_tests.clear()
+
+        _y_labels        = ["Teste Trecute","Teste Picate"]
+        _y_labels_colors = ["#1da14f","#ba1c34"]
+
+        self.wdg_plot_tests.draw(
+                                    "",
+                                    _values,
+                                    _y_labels,
+                                    _y_labels_colors,
+                                    _x_labels)
+
+        _values, _x_labels = self.read_time()
+
+        self.wdg_plot_time.clear()
+
+        _y_labels        = ["Minute in Test"]
+        _y_labels_colors = ["#4b27e8"]
+
+        self.wdg_plot_time.draw(
+                                    "",
+                                    _values,
+                                    _y_labels,
+                                    _y_labels_colors,
+                                    _x_labels)
+
+"""*************************************************************************************************
+****************************************************************************************************
+*************************************************************************************************"""
 class Pharm_WDG_Desktop_Test(QWidget):
 
     def __init__(self,parent,category,stats):
@@ -845,6 +1067,7 @@ class Pharm_WDG_Desktop_Test(QWidget):
         self.parent.bt_test.show()
         self.parent.bt_learn.show()
         self.parent.bt_gen.show()
+        self.parent.bt_stats.show()
         self.parent.bt_exp.show()
         self.parent.wdg_test.hide()
 
