@@ -33,6 +33,7 @@ from docx.oxml.ns                 import qn
 from io                           import StringIO
 from io                           import BytesIO
 from pprint                       import pprint
+from pharm_stats.pharm_stats      import Pharm_Stats_DB
 
 """*************************************************************************************************
 ****************************************************************************************************
@@ -64,6 +65,9 @@ class Pharm_UI(QMainWindow):
         self.stack_index  = 0
         self.db           = db   
         self.dekstops     = []   
+        self.stats        = None
+
+        self.create_stats()
 
         self.draw_gui() 
 
@@ -147,7 +151,7 @@ class Pharm_UI(QMainWindow):
 
         for _idx in range(len(self.db)):
 
-            _desktop = Pharm_WDG_Desktop(self.db[_idx])
+            _desktop = Pharm_WDG_Desktop(self.db[_idx],self.stats)
 
             self.dekstops.append(_desktop)
 
@@ -155,14 +159,28 @@ class Pharm_UI(QMainWindow):
 
         self.context.setCurrentIndex(0)  
 
+    def create_stats(self):
+
+        _path = os.path.join(os.path.expanduser("~"),".pharm")
+
+        if not os.path.exists(_path):
+
+            os.mkdir(_path)
+
+        _path = os.path.join(_path,"pharm.db")
+
+        self.stats = Pharm_Stats_DB(_path)
+
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
 class Pharm_Model_Test(object):
 
-    def __init__(self):
+    def __init__(self,stats,category):
 
         self.questions = []
+        self.stats     = stats
+        self.category  = category
 
     def clear(self):
 
@@ -172,6 +190,21 @@ class Pharm_Model_Test(object):
 
                 _answer.is_selected = False
 
+    def get_score(self,question):
+
+        _user_scor = 0
+        _nrm_scor  = 0
+
+        for _answer in question.answers:
+
+            if _answer.corect and  _answer.selected:
+                _user_scor += 1
+
+            if _answer.corect:
+                _nrm_scor += 1
+
+        return _user_scor,_nrm_scor
+
     def get_result(self):
 
         _total    = len(self.questions)
@@ -180,34 +213,41 @@ class Pharm_Model_Test(object):
 
         for _question in self.questions:
 
-            _user_scor = 0
-            _nrm_scor  = 0
-
-            for _answer in _question.answers:
-
-                if _answer.corect and  _answer.selected:
-                    _user_scor += 1
-
-                if _answer.corect:
-                    _nrm_scor += 1
+            _user_scor,_nrm_scor = self.get_score(_question)
 
             if _user_scor == _nrm_scor:
                 _corect += 1
             else:
                 _incorect += 1
 
+            self.add_stats_question(_question,1)
+
         return _corect,_incorect
+
+    def add_stats_question(self,question,type):
+
+        _status    = 0
+
+        _user_scor,_nrm_scor = self.get_score(question)
+
+        if _user_scor == _nrm_scor:
+            _status = 1
+        else:
+            _status = 0
+
+        self.stats.add_question(self.category.name,_status)
 
 """*************************************************************************************************
 ****************************************************************************************************
 *************************************************************************************************"""
 class Pharm_WDG_Desktop(QWidget):
 
-    def __init__(self,category):
+    def __init__(self,category,stats):
 
         QWidget.__init__(self)
 
         self.category = category
+        self.stats    = stats
 
         self.draw_gui()
 
@@ -228,7 +268,7 @@ class Pharm_WDG_Desktop(QWidget):
         self.bt_gen.clicked.connect(self.clbk_bt_gen)
         self.bt_exp.clicked.connect(self.clbk_bt_exp)
 
-        self.wdg_test = Pharm_WDG_Desktop_Test(self,self.category)
+        self.wdg_test = Pharm_WDG_Desktop_Test(self,self.category,self.stats)
 
         self.bt_layout = QHBoxLayout()
         self.bt_layout.addWidget(self.bt_learn)
@@ -539,18 +579,7 @@ class Pharm_WDG_Desktop(QWidget):
                                         end={"sz": 5, "val": "single", "color": "#000000", "space": "0"})
 
     def set_cell_border(sefl, cell, **kwargs):
-        """
-        Set cell`s border
-        Usage:
 
-        set_cell_border(
-            cell,
-            top={"sz": 12, "val": "single", "color": "#FF0000", "space": "0"},
-            bottom={"sz": 12, "color": "#00FF00", "val": "single"},
-            start={"sz": 24, "val": "dashed", "shadow": "true"},
-            end={"sz": 12, "val": "dashed"},
-        )
-        """
         tc = cell._tc
         tcPr = tc.get_or_add_tcPr()
 
@@ -644,7 +673,7 @@ class Pharm_WDG_Desktop(QWidget):
 *************************************************************************************************"""
 class Pharm_WDG_Desktop_Test(QWidget):
 
-    def __init__(self,parent,category):
+    def __init__(self,parent,category,stats):
 
         QWidget.__init__(self)
 
@@ -652,9 +681,11 @@ class Pharm_WDG_Desktop_Test(QWidget):
         self.question_number = 0
         self.parent          = parent
         self.test_type       = ""
-        self.test_learn      = Pharm_Model_Test()
-        self.test_exam       = Pharm_Model_Test()
-        self.is_finished     = False
+        self.stats           = stats
+        self.test_learn      = Pharm_Model_Test(self.stats,self.category)
+        self.test_exam       = Pharm_Model_Test(self.stats,self.category)
+        self.is_finished     = False   
+        self.start_time      = datetime.now()     
 
         self.test_learn.questions = self.category.questions
 
@@ -737,6 +768,8 @@ class Pharm_WDG_Desktop_Test(QWidget):
 
         self.lbl_result.hide()
         self.set_status()
+
+        self.start_time = datetime.now()     
 
     def get_test_questions(self):
 
@@ -824,7 +857,8 @@ class Pharm_WDG_Desktop_Test(QWidget):
         if self.test_type == "learn":
 
             self.color_questions_status()
-            
+
+            self.test_learn.add_stats_question(self.test_learn.questions[self.question_number],0)
         else:
             self.is_finished = True
 
@@ -846,6 +880,15 @@ class Pharm_WDG_Desktop_Test(QWidget):
                 self.lbl_result.setText("PICAT Corecte[%s] Incorecte[%s]" % (_corect,_incorect))
                 self.lbl_result.setStyleSheet("QLabel { background-color : #ba2012; font: 18pt;  color: #ffffff}")
                 self.lbl_result.setAlignment(Qt.AlignCenter)
+
+            _end_time = datetime.now()
+
+            self.stats.add_test(
+                                (_end_time - self.start_time).total_seconds(),
+                                _corect,
+                                _incorect,
+                                int(_corect >= PHARM_MIN_CORECT_QUESTIONS)
+                                )
 
     def color_questions_status(self):
 
